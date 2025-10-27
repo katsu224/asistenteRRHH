@@ -1,11 +1,25 @@
 import React from 'react';
 import { Message, ActionType } from '../types';
 
+/**
+ * @interface ActionButtonsProps
+ * @property {(action: ActionType) => void} onAction - Callback function to handle follow-up actions.
+ * @property {boolean} disabled - Whether the action buttons should be disabled.
+ */
 interface ActionButtonsProps {
   onAction: (action: ActionType) => void;
   disabled: boolean;
 }
 
+/**
+ * A reusable button component for the action buttons.
+ * @param {object} props - The props for the component.
+ * @param {React.ReactNode} props.icon - The icon to display in the button.
+ * @param {string} props.label - The text label for the button.
+ * @param {() => void} props.onClick - The function to call when the button is clicked.
+ * @param {boolean} props.disabled - Whether the button should be disabled.
+ * @returns {React.ReactElement} The rendered button component.
+ */
 const ActionButton: React.FC<{ icon: React.ReactNode; label: string; onClick: () => void; disabled: boolean }> = ({ icon, label, onClick, disabled }) => (
     <button
       onClick={onClick}
@@ -17,6 +31,11 @@ const ActionButton: React.FC<{ icon: React.ReactNode; label: string; onClick: ()
     </button>
 );
 
+/**
+ * A component that renders a set of action buttons for a chat message.
+ * @param {ActionButtonsProps} props - The props for the component.
+ * @returns {React.ReactElement} The rendered action buttons component.
+ */
 const ActionButtons: React.FC<ActionButtonsProps> = ({ onAction, disabled }) => (
   <div className="flex items-center gap-2 mt-3 flex-wrap">
       <ActionButton
@@ -40,6 +59,14 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({ onAction, disabled }) => 
   </div>
 );
 
+/**
+ * @interface ChatMessageProps
+ * @property {Message} message - The message object to display.
+ * @property {string} botImage - The URL of the bot's avatar image.
+ * @property {string} themeColor - The theme color for the user's messages.
+ * @property {(action: ActionType, message: Message) => void} onAction - Callback function to handle follow-up actions.
+ * @property {boolean} isLoading - Whether the application is currently in a loading state.
+ */
 interface ChatMessageProps {
   message: Message;
   botImage: string;
@@ -48,6 +75,12 @@ interface ChatMessageProps {
   isLoading: boolean;
 }
 
+/**
+ * A component that displays a single chat message, either from the user or the model.
+ * It includes the message text, an optional image, and action buttons for model messages.
+ * @param {ChatMessageProps} props - The props for the component.
+ * @returns {React.ReactElement} The rendered chat message component.
+ */
 export const ChatMessage: React.FC<ChatMessageProps> = ({ message, botImage, themeColor, onAction, isLoading }) => {
   const isModel = message.role === 'model';
 

@@ -10,9 +10,19 @@ const ai = new GoogleGenAI({ apiKey: API_KEY });
 const textModel = 'gemini-2.5-flash';
 const imageModel = 'gemini-2.5-flash-image';
 
+/**
+ * Returns the base system instruction for the AI model.
+ * @param {string} botName - The name of the bot.
+ * @returns {string} The system instruction.
+ */
 const getBaseSystemInstruction = (botName: string) => 
   `Eres ${botName}, un asistente de Recursos Humanos experto y amigable. Tu conocimiento se limita estrictamente a los documentos e imágenes que se te proporcionan como contexto. Tu objetivo es ayudar a los empleados a comprender las políticas de la empresa. Responde únicamente basándote en el material proporcionado. Si la respuesta no está en el material, indica amablemente que no tienes esa información. Responde en español.`;
 
+/**
+ * Builds the knowledge parts for the AI model from the knowledge base.
+ * @param {KnowledgeItem[]} knowledgeBase - The knowledge base.
+ * @returns {Part[]} The knowledge parts.
+ */
 const buildKnowledgeParts = (knowledgeBase: KnowledgeItem[]): Part[] => {
   const parts: Part[] = [];
   knowledgeBase.forEach(item => {
@@ -34,6 +44,13 @@ const buildKnowledgeParts = (knowledgeBase: KnowledgeItem[]): Part[] => {
   return parts;
 };
 
+/**
+ * Generates content using the AI model.
+ * @param {string} systemInstruction - The system instruction for the AI model.
+ * @param {string} userPrompt - The user's prompt.
+ * @param {KnowledgeItem[]} knowledgeBase - The knowledge base.
+ * @returns {Promise<string>} The generated content.
+ */
 const generateContent = async (systemInstruction: string, userPrompt: string, knowledgeBase: KnowledgeItem[]) => {
   try {
     const knowledgeParts = buildKnowledgeParts(knowledgeBase);
@@ -56,22 +73,51 @@ const generateContent = async (systemInstruction: string, userPrompt: string, kn
   }
 };
 
+/**
+ * Gets an answer from the AI model for a given question.
+ * @param {KnowledgeItem[]} knowledgeBase - The knowledge base.
+ * @param {string} question - The user's question.
+ * @param {string} botName - The name of the bot.
+ * @returns {Promise<string>} The answer.
+ */
 export const getAnswer = async (knowledgeBase: KnowledgeItem[], question: string, botName: string): Promise<string> => {
   return generateContent(getBaseSystemInstruction(botName), question, knowledgeBase);
 };
 
+/**
+ * Re-explains a previous answer in a different way.
+ * @param {KnowledgeItem[]} knowledgeBase - The knowledge base.
+ * @param {string} question - The original question.
+ * @param {string} originalAnswer - The original answer.
+ * @param {string} botName - The name of the bot.
+ * @returns {Promise<string>} The re-explained answer.
+ */
 export const reExplain = async (knowledgeBase: KnowledgeItem[], question: string, originalAnswer: string, botName: string): Promise<string> => {
   const systemInstruction = `${getBaseSystemInstruction(botName)} Un empleado no entendió una respuesta y ha pedido una explicación alternativa.`;
   const userPrompt = `Pregunta Original: "${question}"\nRespuesta Anterior: "${originalAnswer}"\n\nPor favor, explica la respuesta anterior de una manera diferente, usando una analogía o términos más sencillos para que sea más fácil de entender.`;
   return generateContent(systemInstruction, userPrompt, knowledgeBase);
 };
 
+/**
+ * Gets an example for a previous answer.
+ * @param {KnowledgeItem[]} knowledgeBase - The knowledge base.
+ * @param {string} question - The original question.
+ * @param {string} originalAnswer - The original answer.
+ * @param {string} botName - The name of the bot.
+ * @returns {Promise<string>} The example.
+ */
 export const getExample = async (knowledgeBase: KnowledgeItem[], question: string, originalAnswer: string, botName: string): Promise<string> => {
   const systemInstruction = `${getBaseSystemInstruction(botName)} Un empleado ha solicitado un ejemplo práctico relacionado con una respuesta.`;
   const userPrompt = `Pregunta Original: "${question}"\nRespuesta Anterior: "${originalAnswer}"\n\nPor favor, proporciona un ejemplo concreto y práctico que ilustre el punto principal de la respuesta anterior.`;
   return generateContent(systemInstruction, userPrompt, knowledgeBase);
 };
 
+/**
+ * Generates an image for a given concept.
+ * @param {string} question - The user's question.
+ * @param {string} answer - The model's answer.
+ * @returns {Promise<string>} The generated image as a base64 data URL.
+ */
 export const generateImageForConcept = async (question: string, answer: string): Promise<string> => {
   try {
     const promptGenerationInstruction = `Basado en la siguiente pregunta y respuesta de un manual de empleado, crea un prompt corto y descriptivo en inglés para un modelo de generación de imágenes de IA. El prompt debe capturar la idea central de manera visual y abstracta. Debe ser apto para un entorno profesional. El prompt no debe contener más de 20 palabras.`;

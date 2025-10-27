@@ -6,21 +6,44 @@ import { Message, ActionType, Bot, KnowledgeItem } from './types';
 import * as geminiService from './services/geminiService';
 import { bots } from './assets/bots';
 
+/**
+ * The main component of the application that orchestrates the entire chat interface.
+ * It manages the application's state, including bot selection, knowledge base,
+ * chat history, and user input. It also handles interactions with the Gemini API service.
+ * @returns {React.ReactElement} The rendered component.
+ */
 const App: React.FC = () => {
+  // State for the current view of the application ('selecting' or 'chatting')
   const [appState, setAppState] = useState<'selecting' | 'chatting'>('selecting');
+  // State for the currently selected bot
   const [selectedBot, setSelectedBot] = useState<Bot | null>(null);
+  // State for the collection of knowledge items (documents, images)
   const [knowledgeBase, setKnowledgeBase] = useState<KnowledgeItem[]>([]);
+  // State for the history of chat messages
   const [chatHistory, setChatHistory] = useState<Message[]>([]);
+  // State for the user's current input in the chat box
   const [userInput, setUserInput] = useState('');
+  // State to indicate if the application is currently waiting for a response from the API
   const [isLoading, setIsLoading] = useState(false);
+  // State to store any error messages
   const [error, setError] = useState<string | null>(null);
 
+  // Ref to the end of the chat history, used for auto-scrolling
   const chatEndRef = useRef<HTMLDivElement>(null);
 
+  /**
+   * Effect to automatically scroll to the latest message in the chat history.
+   * This runs whenever the chat history or the loading state changes.
+   */
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [chatHistory, isLoading]);
 
+  /**
+   * Handles the selection of a bot from the BotSelector component.
+   * It sets the selected bot, changes the app state to 'chatting', and initializes the chat with a welcome message.
+   * @param {Bot} bot The bot object that was selected by the user.
+   */
   const handleBotSelect = (bot: Bot) => {
     setSelectedBot(bot);
     setAppState('chatting');
@@ -33,10 +56,19 @@ const App: React.FC = () => {
     ]);
   };
 
+  /**
+   * Adds a new knowledge item to the knowledge base.
+   * @param {KnowledgeItem} item The knowledge item to add.
+   */
   const handleAddKnowledge = (item: KnowledgeItem) => {
     setKnowledgeBase((prev) => [...prev, item]);
   };
 
+  /**
+   * Handles the submission of a new message by the user.
+   * It sends the user's message to the Gemini API and updates the chat history with the response.
+   * @param {React.FormEvent} e The form event.
+   */
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!userInput.trim() || isLoading || !selectedBot) return;
@@ -68,6 +100,12 @@ const App: React.FC = () => {
     }
   };
   
+  /**
+   * Handles follow-up actions triggered by the user from a chat message (e.g., explain, example, image).
+   * It calls the appropriate Gemini API service based on the action and updates the chat history.
+   * @param {ActionType} action The type of action to perform.
+   * @param {Message} message The message on which the action is being performed.
+   */
   const handleAction = async (action: ActionType, message: Message) => {
     if (!selectedBot) return;
     setIsLoading(true);
