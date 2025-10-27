@@ -3,12 +3,24 @@ import { KnowledgeItem, Bot } from '../types';
 
 declare const pdfjsLib: any;
 
+/**
+ * @interface KnowledgeManagerProps
+ * @property {KnowledgeItem[]} knowledgeBase - The current list of knowledge items.
+ * @property {(item: KnowledgeItem) => void} onAddKnowledge - Callback function to add a new knowledge item.
+ * @property {Bot} bot - The currently selected bot.
+ */
 interface KnowledgeManagerProps {
     knowledgeBase: KnowledgeItem[];
     onAddKnowledge: (item: KnowledgeItem) => void;
     bot: Bot;
 }
 
+/**
+ * A component that manages the knowledge base of the assistant.
+ * It allows users to add text and upload files (images, PDFs) to the knowledge base.
+ * @param {KnowledgeManagerProps} props - The props for the component.
+ * @returns {React.ReactElement} The rendered knowledge manager component.
+ */
 const KnowledgeManager: React.FC<KnowledgeManagerProps> = ({ knowledgeBase, onAddKnowledge, bot }) => {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [showTextModal, setShowTextModal] = useState(false);
@@ -16,6 +28,12 @@ const KnowledgeManager: React.FC<KnowledgeManagerProps> = ({ knowledgeBase, onAd
     const [textName, setTextName] = useState('');
     const [isParsing, setIsParsing] = useState(false);
 
+    /**
+     * Handles the change event of the file input.
+     * It reads the selected file and adds it to the knowledge base.
+     * Supports image and PDF files.
+     * @param {React.ChangeEvent<HTMLInputElement>} event - The file input change event.
+     */
     const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         if (!file) return;
@@ -79,6 +97,9 @@ const KnowledgeManager: React.FC<KnowledgeManagerProps> = ({ knowledgeBase, onAd
         event.target.value = '';
     };
 
+    /**
+     * Handles the addition of a new text-based knowledge item from the modal.
+     */
     const handleAddText = () => {
         if (textName.trim() && textContent.trim()) {
             onAddKnowledge({
@@ -93,6 +114,10 @@ const KnowledgeManager: React.FC<KnowledgeManagerProps> = ({ knowledgeBase, onAd
         }
     };
 
+    /**
+     * A simple loading spinner component.
+     * @returns {React.ReactElement} The rendered loading spinner.
+     */
     const LoadingSpinner = () => (
         <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
@@ -100,6 +125,15 @@ const KnowledgeManager: React.FC<KnowledgeManagerProps> = ({ knowledgeBase, onAd
         </svg>
     );
 
+    /**
+     * A reusable button component for the knowledge manager actions.
+     * @param {object} props - The props for the component.
+     * @param {() => void} props.onClick - The function to call when the button is clicked.
+     * @param {React.ReactNode} props.icon - The icon to display in the button.
+     * @param {string} props.label - The text label for the button.
+     * @param {boolean} [props.disabled] - Whether the button should be disabled.
+     * @returns {React.ReactElement} The rendered button component.
+     */
     const ActionButton: React.FC<{ onClick: () => void; icon: React.ReactNode; label: string; disabled?: boolean }> = ({ onClick, icon, label, disabled }) => (
         <button
             onClick={onClick}

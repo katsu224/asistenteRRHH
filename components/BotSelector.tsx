@@ -1,11 +1,21 @@
 import React from 'react';
 import { Bot } from '../types';
 
+/**
+ * @interface BotSelectorProps
+ * @property {Bot[]} bots - An array of available bot objects.
+ * @property {(bot: Bot) => void} onSelect - Callback function to handle the selection of a bot.
+ */
 interface BotSelectorProps {
   bots: Bot[];
   onSelect: (bot: Bot) => void;
 }
 
+/**
+ * A component that displays a selection of bots for the user to choose from.
+ * @param {BotSelectorProps} props - The props for the component.
+ * @returns {React.ReactElement} The rendered bot selector component.
+ */
 const BotSelector: React.FC<BotSelectorProps> = ({ bots, onSelect }) => {
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 flex flex-col items-center justify-center p-4">

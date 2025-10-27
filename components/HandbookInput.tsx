@@ -1,14 +1,29 @@
 
 import React, { useState } from 'react';
 
+/**
+ * @interface HandbookInputProps
+ * @property {(content: string) => void} onSubmit - Callback function to handle the submission of the handbook content.
+ * @property {boolean} isLoading - Whether the application is currently in a loading state.
+ */
 interface HandbookInputProps {
   onSubmit: (content: string) => void;
   isLoading: boolean;
 }
 
+/**
+ * A component that provides a textarea for users to input their employee handbook content.
+ * @param {HandbookInputProps} props - The props for the component.
+ * @returns {React.ReactElement} The rendered handbook input component.
+ */
 const HandbookInput: React.FC<HandbookInputProps> = ({ onSubmit, isLoading }) => {
   const [content, setContent] = useState('');
 
+  /**
+   * Handles the form submission.
+   * It trims the content and calls the onSubmit callback if the content is not empty.
+   * @param {React.FormEvent} e - The form event.
+   */
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (content.trim()) {
