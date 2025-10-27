@@ -1,0 +1,5 @@
+{
+  "name": "Asistente de RRHH IA Personalizable",
+  "description": "Una aplicación que permite seleccionar un bot de empresa, subir un manual de empleado (texto, PDF, imágenes) para crear una memoria personalizable y permitir a los trabajadores hacer preguntas, obtener explicaciones, ejemplos e imágenes para comprender las reglas del negocio.",
+  "requestFramePermissions": []
+}
